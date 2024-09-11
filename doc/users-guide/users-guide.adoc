@@ -15,6 +15,7 @@ home page.
 .Overview of a system running ODP applications
 image::overview.svg[align="center"]
 
+
 ODP is an API specification that allows many implementations to provide
 platform independence, automatic hardware acceleration and CPU scaling to
 high performance networking  applications. This document describes how to
