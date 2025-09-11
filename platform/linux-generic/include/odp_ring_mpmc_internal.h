@@ -13,6 +13,7 @@
 
 #include <odp/api/plat/atomic_inlines.h>
 #include <odp/api/plat/cpu_inlines.h>
+#include <odp/api/abi/wait_until.h>
 
 #include <odp_ring_common.h>
 
@@ -194,8 +195,7 @@ static inline uint32_t _RING_MPMC_DEQ(_ring_mpmc_gen_t *ring,
 	*data = ring_data[(old_head + 1) & ring_mask];
 
 	/* Wait until other readers have updated the tail */
-	while (odp_unlikely(odp_atomic_load_u32(&ring->r.r_tail) != old_head))
-		odp_cpu_pause();
+	_odp_wait_until_equal_u32(&ring->r.r_tail, old_head);
 
 	/* Release the new reader tail, writers acquire it. */
 	odp_atomic_store_rel_u32(&ring->r.r_tail, new_head);
@@ -240,8 +240,7 @@ static inline uint32_t _RING_MPMC_DEQ_MULTI(_ring_mpmc_gen_t *ring,
 		data[i] = ring_data[(old_head + 1 + i) & ring_mask];
 
 	/* Wait until other readers have updated the tail */
-	while (odp_unlikely(odp_atomic_load_u32(&ring->r.r_tail) != old_head))
-		odp_cpu_pause();
+	_odp_wait_until_equal_u32(&ring->r.r_tail, old_head);
 
 	/* Release the new reader tail, writers acquire it. */
 	odp_atomic_store_rel_u32(&ring->r.r_tail, new_head);
@@ -282,8 +281,7 @@ static inline uint32_t _RING_MPMC_DEQ_BATCH(_ring_mpmc_gen_t *ring,
 		data[i] = ring_data[(old_head + 1 + i) & ring_mask];
 
 	/* Wait until other readers have updated the tail */
-	while (odp_unlikely(odp_atomic_load_u32(&ring->r.r_tail) != old_head))
-		odp_cpu_pause();
+	_odp_wait_until_equal_u32(&ring->r.r_tail, old_head);
 
 	/* Release the new reader tail, writers acquire it. */
 	odp_atomic_store_rel_u32(&ring->r.r_tail, new_head);
@@ -327,8 +325,7 @@ static inline uint32_t _RING_MPMC_ENQ(_ring_mpmc_gen_t *ring,
 	ring_data[(old_head + 1) & ring_mask] = data;
 
 	/* Wait until other writers have updated the tail */
-	while (odp_unlikely(odp_atomic_load_u32(&ring->r.w_tail) != old_head))
-		odp_cpu_pause();
+	_odp_wait_until_equal_u32(&ring->r.w_tail, old_head);
 
 	/* Release the new writer tail, readers acquire it. */
 	odp_atomic_store_rel_u32(&ring->r.w_tail, new_head);
@@ -378,8 +375,7 @@ static inline uint32_t _RING_MPMC_ENQ_MULTI(_ring_mpmc_gen_t *ring,
 		ring_data[(old_head + 1 + i) & ring_mask] = data[i];
 
 	/* Wait until other writers have updated the tail */
-	while (odp_unlikely(odp_atomic_load_u32(&ring->r.w_tail) != old_head))
-		odp_cpu_pause();
+	_odp_wait_until_equal_u32(&ring->r.w_tail, old_head);
 
 	/* Release the new writer tail, readers acquire it. */
 	odp_atomic_store_rel_u32(&ring->r.w_tail, new_head);
@@ -425,8 +421,7 @@ static inline uint32_t _RING_MPMC_ENQ_BATCH(_ring_mpmc_gen_t *ring,
 		ring_data[(old_head + 1 + i) & ring_mask] = data[i];
 
 	/* Wait until other writers have updated the tail */
-	while (odp_unlikely(odp_atomic_load_u32(&ring->r.w_tail) != old_head))
-		odp_cpu_pause();
+	_odp_wait_until_equal_u32(&ring->r.w_tail, old_head);
 
 	/* Release the new writer tail, readers acquire it. */
 	odp_atomic_store_rel_u32(&ring->r.w_tail, new_head);
